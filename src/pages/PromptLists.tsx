@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "@/components/ui/input";
 import { 
   Select,
   SelectContent,
@@ -12,7 +13,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Table,
   TableBody,
@@ -27,253 +27,304 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { ChevronDown, Copy, Edit, Plus, Trash2 } from "lucide-react";
+import { ChevronDown, Copy, Edit, Plus, Trash2, Search, Filter, MoreHorizontal } from "lucide-react";
 
 export default function PromptLists() {
   const navigate = useNavigate();
+  const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState({
-    type: "all",
-    sortBy: "newest",
-    owner: "all",
-    showArchive: false
+    isPartOfBatch: "all",
+    taskStatus: "all", 
+    isOwnedByYou: "all",
+    hasBeenExported: "all"
   });
 
   const promptLists = [
-    { id: 1, name: ".mn", description: "Marketing prompts collection", public: false, status: "Active", prompts: 25 },
-    { id: 2, name: "Creative Writing", description: "Prompts for creative content", public: false, status: "Active", prompts: 18 },
-    { id: 3, name: "Technical Docs", description: "Documentation generation prompts", public: false, status: "Archived", prompts: 12 },
-    { id: 4, name: "Social Media", description: "Social media content prompts", public: false, status: "Active", prompts: 30 }
+    { id: "PL001", name: "Marketing Prompts", description: "Collection of marketing-focused prompts", promptCount: 25, status: "Active", batch: "Batch-2024", isOwned: true, exported: false },
+    { id: "PL002", name: "Creative Writing", description: "Prompts for creative writing and storytelling", promptCount: 18, status: "Active", batch: "Batch-2024", isOwned: true, exported: true },
+    { id: "PL003", name: "Code Generation", description: "Programming and development prompts", promptCount: 32, status: "Archived", batch: "Batch-2023", isOwned: false, exported: false },
+    { id: "PL004", name: "Data Analysis", description: "Prompts for data analysis and insights", promptCount: 15, status: "Active", batch: null, isOwned: true, exported: true },
+    { id: "PL005", name: "Customer Support", description: "Customer service and support prompts", promptCount: 22, status: "Active", batch: "Batch-2024", isOwned: false, exported: false }
   ];
 
   const publicPromptLists = [
-    { id: 5, name: "Blog Writing", description: "Community blog writing prompts", public: true, status: "Active", author: "Content Team", prompts: 45 },
-    { id: 6, name: "Email Marketing", description: "Email campaign prompts", public: true, status: "Active", author: "Marketing Pro", prompts: 22 }
+    { id: "PPL001", name: "Business Essentials", description: "Essential prompts for business operations", author: "Community", promptCount: 45, status: "Active", batch: "Template-V1" },
+    { id: "PPL002", name: "Content Creation Hub", description: "Comprehensive content creation prompts", author: "Expert User", promptCount: 38, status: "Active", batch: "Template-V2" }
   ];
+
+  const resetFilters = () => {
+    setFilters({
+      isPartOfBatch: "all",
+      taskStatus: "all",
+      isOwnedByYou: "all", 
+      hasBeenExported: "all"
+    });
+    setSearchQuery("");
+  };
 
   return (
     <AppLayout>
-      <div className="p-8 space-y-6">
-        {/* Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-foreground">Prompt Lists</h1>
-          <Button 
-            onClick={() => navigate("/prompt-lists/new")}
-            className="bg-gradient-primary hover:shadow-glow transition-smooth"
-          >
-            <Plus className="h-4 w-4 mr-2" />
-            Create New Prompt List
-          </Button>
+      <div className="flex h-full">
+        {/* Main Content */}
+        <div className="flex-1 p-8 space-y-6">
+          {/* Header */}
+          <div className="flex justify-between items-center">
+            <div>
+              <div className="text-sm text-muted-foreground mb-1">Prompt Lists / List</div>
+              <h1 className="text-3xl font-bold text-foreground">Prompt Lists</h1>
+            </div>
+            <Button 
+              onClick={() => navigate("/prompt-lists/new")}
+              className="bg-gradient-primary hover:shadow-glow transition-smooth"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              New Prompt List
+            </Button>
+          </div>
+
+          {/* Search Bar */}
+          <div className="relative max-w-md">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+            <Input
+              placeholder="Search"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="pl-10 bg-background border-border"
+            />
+          </div>
+
+          {/* Prompt Lists Content */}
+          <Tabs defaultValue="your" className="space-y-6">
+            <TabsList className="bg-muted/50">
+              <TabsTrigger value="your" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Your Prompt Lists
+              </TabsTrigger>
+              <TabsTrigger value="public" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
+                Public Prompt Lists
+              </TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="your">
+              <Card className="bg-gradient-card shadow-medium border-0">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-border/50">
+                        <TableHead className="font-semibold text-foreground">
+                          ID <ChevronDown className="inline h-3 w-3 ml-1" />
+                        </TableHead>
+                        <TableHead className="font-semibold text-foreground">Name</TableHead>
+                        <TableHead className="font-semibold text-foreground">Description</TableHead>
+                        <TableHead className="font-semibold text-foreground">Prompt Count</TableHead>
+                        <TableHead className="font-semibold text-foreground">
+                          Status <ChevronDown className="inline h-3 w-3 ml-1" />
+                        </TableHead>
+                        <TableHead className="font-semibold text-foreground">
+                          List Batch <ChevronDown className="inline h-3 w-3 ml-1" />
+                        </TableHead>
+                        <TableHead className="font-semibold text-foreground">Has been exported</TableHead>
+                        <TableHead className="font-semibold text-foreground text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {promptLists.map((list) => (
+                        <TableRow key={list.id} className="border-border/50 hover:bg-muted/30 transition-smooth">
+                          <TableCell className="font-medium text-foreground">{list.id}</TableCell>
+                          <TableCell>
+                            <Button variant="link" className="p-0 h-auto text-primary hover:text-primary-hover font-medium">
+                              {list.name}
+                            </Button>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground max-w-xs truncate">
+                            {list.description}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-secondary text-secondary-foreground">
+                              {list.promptCount}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant={list.status === "Active" ? "default" : "secondary"} className="bg-accent text-accent-foreground">
+                              {list.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-foreground">
+                            {list.batch || "-"}
+                          </TableCell>
+                          <TableCell className="text-foreground">
+                            {list.exported ? "Yes" : "No"}
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-popover border border-border shadow-lg">
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <Edit className="h-4 w-4 mr-2" />
+                                  Edit
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <Copy className="h-4 w-4 mr-2" />
+                                  Duplicate
+                                </DropdownMenuItem>
+                                <DropdownMenuItem className="cursor-pointer text-destructive">
+                                  <Trash2 className="h-4 w-4 mr-2" />
+                                  Delete
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            <TabsContent value="public">
+              <Card className="bg-gradient-card shadow-medium border-0">
+                <CardContent className="p-0">
+                  <Table>
+                    <TableHeader>
+                      <TableRow className="border-border/50">
+                        <TableHead className="font-semibold text-foreground">
+                          ID <ChevronDown className="inline h-3 w-3 ml-1" />
+                        </TableHead>
+                        <TableHead className="font-semibold text-foreground">Name</TableHead>
+                        <TableHead className="font-semibold text-foreground">Description</TableHead>
+                        <TableHead className="font-semibold text-foreground">Author</TableHead>
+                        <TableHead className="font-semibold text-foreground">Prompt Count</TableHead>
+                        <TableHead className="font-semibold text-foreground">
+                          Status <ChevronDown className="inline h-3 w-3 ml-1" />
+                        </TableHead>
+                        <TableHead className="font-semibold text-foreground text-right">Actions</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {publicPromptLists.map((list) => (
+                        <TableRow key={list.id} className="border-border/50 hover:bg-muted/30 transition-smooth">
+                          <TableCell className="font-medium text-foreground">{list.id}</TableCell>
+                          <TableCell>
+                            <Button variant="link" className="p-0 h-auto text-primary hover:text-primary-hover font-medium">
+                              {list.name}
+                            </Button>
+                          </TableCell>
+                          <TableCell className="text-muted-foreground max-w-xs truncate">
+                            {list.description}
+                          </TableCell>
+                          <TableCell className="text-foreground">
+                            {list.author}
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="outline" className="bg-secondary text-secondary-foreground">
+                              {list.promptCount}
+                            </Badge>
+                          </TableCell>
+                          <TableCell>
+                            <Badge variant="default" className="bg-success text-success-foreground">
+                              {list.status}
+                            </Badge>
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DropdownMenu>
+                              <DropdownMenuTrigger asChild>
+                                <Button variant="ghost" size="sm" className="h-8 w-8 p-0">
+                                  <MoreHorizontal className="h-4 w-4" />
+                                </Button>
+                              </DropdownMenuTrigger>
+                              <DropdownMenuContent align="end" className="bg-popover border border-border shadow-lg">
+                                <DropdownMenuItem className="cursor-pointer">
+                                  <Copy className="h-4 w-4 mr-2" />
+                                  Use Template
+                                </DropdownMenuItem>
+                              </DropdownMenuContent>
+                            </DropdownMenu>
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </CardContent>
+              </Card>
+            </TabsContent>
+          </Tabs>
         </div>
 
-        {/* Filters */}
-        <Card className="bg-gradient-card shadow-medium border-0">
-          <CardContent className="p-6">
-            <div className="flex flex-wrap gap-4 items-center">
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Type</label>
-                <Select value={filters.type} onValueChange={(value) => setFilters(prev => ({ ...prev, type: value }))}>
-                  <SelectTrigger className="w-32">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All</SelectItem>
-                    <SelectItem value="private">Private</SelectItem>
-                    <SelectItem value="public">Public</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+        {/* Filters Sidebar */}
+        <div className="w-80 border-l border-border bg-background/50 p-6 space-y-6">
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-foreground flex items-center">
+              <Filter className="h-4 w-4 mr-2" />
+              Filters
+            </h3>
+            <Button variant="ghost" size="sm" onClick={resetFilters} className="text-destructive hover:text-destructive">
+              Reset
+            </Button>
+          </div>
 
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Sort by</label>
-                <Select value={filters.sortBy} onValueChange={(value) => setFilters(prev => ({ ...prev, sortBy: value }))}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="newest">Newest first</SelectItem>
-                    <SelectItem value="oldest">Oldest first</SelectItem>
-                    <SelectItem value="name">Name A-Z</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="space-y-2">
-                <label className="text-sm font-medium text-foreground">Owner</label>
-                <Select value={filters.owner} onValueChange={(value) => setFilters(prev => ({ ...prev, owner: value }))}>
-                  <SelectTrigger className="w-40">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="all">All owners</SelectItem>
-                    <SelectItem value="me">Me</SelectItem>
-                    <SelectItem value="team">Team</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="flex items-center space-x-2 pt-6">
-                <Checkbox 
-                  id="archive" 
-                  checked={filters.showArchive}
-                  onCheckedChange={(checked) => setFilters(prev => ({ ...prev, showArchive: checked as boolean }))}
-                />
-                <label htmlFor="archive" className="text-sm font-medium text-foreground">
-                  Show only Archive
-                </label>
-              </div>
-
-              <div className="flex gap-2 pt-6 ml-auto">
-                <Button variant="default" className="bg-gradient-primary">
-                  Apply Filters
-                </Button>
-                <Button variant="outline">
-                  Clear
-                </Button>
-              </div>
+          <div className="space-y-4">
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Is part of batch</label>
+              <Select value={filters.isPartOfBatch} onValueChange={(value) => setFilters(prev => ({ ...prev, isPartOfBatch: value }))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All prompt lists" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All prompt lists</SelectItem>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
-          </CardContent>
-        </Card>
 
-        {/* Prompt Lists Content */}
-        <Tabs defaultValue="your" className="space-y-6">
-          <TabsList className="bg-muted/50">
-            <TabsTrigger value="your" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Your Prompt Lists
-            </TabsTrigger>
-            <TabsTrigger value="public" className="data-[state=active]:bg-primary data-[state=active]:text-primary-foreground">
-              Public Prompt Lists
-            </TabsTrigger>
-          </TabsList>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Task statuses</label>
+              <Select value={filters.taskStatus} onValueChange={(value) => setFilters(prev => ({ ...prev, taskStatus: value }))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="active">Active</SelectItem>
+                  <SelectItem value="archived">Archived</SelectItem>
+                  <SelectItem value="draft">Draft</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <TabsContent value="your">
-            <Card className="bg-gradient-card shadow-medium border-0">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-border/50">
-                      <TableHead className="font-semibold text-foreground">Name</TableHead>
-                      <TableHead className="font-semibold text-foreground">Description</TableHead>
-                      <TableHead className="font-semibold text-foreground">Prompts</TableHead>
-                      <TableHead className="font-semibold text-foreground">Public</TableHead>
-                      <TableHead className="font-semibold text-foreground">Status</TableHead>
-                      <TableHead className="font-semibold text-foreground">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {promptLists.map((list) => (
-                      <TableRow key={list.id} className="border-border/50 hover:bg-muted/30 transition-smooth">
-                        <TableCell>
-                          <Button variant="link" className="p-0 h-auto text-primary hover:text-primary-hover">
-                            {list.name}
-                          </Button>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {list.description}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="border-primary text-primary">
-                            {list.prompts} prompts
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="border-muted-foreground text-muted-foreground">
-                            Private
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <DropdownMenu>
-                            <DropdownMenuTrigger asChild>
-                              <Button variant="outline" size="sm" className="h-8">
-                                <span className="flex items-center text-success">
-                                  ✓ {list.status}
-                                </span>
-                                <ChevronDown className="h-3 w-3 ml-1" />
-                              </Button>
-                            </DropdownMenuTrigger>
-                            <DropdownMenuContent>
-                              <DropdownMenuItem>Active</DropdownMenuItem>
-                              <DropdownMenuItem>Archived</DropdownMenuItem>
-                            </DropdownMenuContent>
-                          </DropdownMenu>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline" className="h-8 px-3">
-                              <Edit className="h-3 w-3 mr-1" />
-                              Edit
-                            </Button>
-                            <Button size="sm" variant="outline" className="h-8 px-3 bg-accent hover:bg-accent-hover">
-                              <Copy className="h-3 w-3 mr-1" />
-                              Duplicate
-                            </Button>
-                            <Button size="sm" variant="outline" className="h-8 px-3 text-destructive hover:bg-destructive hover:text-destructive-foreground">
-                              <Trash2 className="h-3 w-3 mr-1" />
-                              Delete
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Is owned by you</label>
+              <Select value={filters.isOwnedByYou} onValueChange={(value) => setFilters(prev => ({ ...prev, isOwnedByYou: value }))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
 
-          <TabsContent value="public">
-            <Card className="bg-gradient-card shadow-medium border-0">
-              <CardContent className="p-0">
-                <Table>
-                  <TableHeader>
-                    <TableRow className="border-border/50">
-                      <TableHead className="font-semibold text-foreground">Name</TableHead>
-                      <TableHead className="font-semibold text-foreground">Description</TableHead>
-                      <TableHead className="font-semibold text-foreground">Prompts</TableHead>
-                      <TableHead className="font-semibold text-foreground">Author</TableHead>
-                      <TableHead className="font-semibold text-foreground">Status</TableHead>
-                      <TableHead className="font-semibold text-foreground">Actions</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {publicPromptLists.map((list) => (
-                      <TableRow key={list.id} className="border-border/50 hover:bg-muted/30 transition-smooth">
-                        <TableCell>
-                          <Button variant="link" className="p-0 h-auto text-primary hover:text-primary-hover">
-                            {list.name}
-                          </Button>
-                        </TableCell>
-                        <TableCell className="text-muted-foreground">
-                          {list.description}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="border-primary text-primary">
-                            {list.prompts} prompts
-                          </Badge>
-                        </TableCell>
-                        <TableCell className="text-foreground">
-                          {list.author}
-                        </TableCell>
-                        <TableCell>
-                          <Badge variant="outline" className="border-success text-success">
-                            {list.status}
-                          </Badge>
-                        </TableCell>
-                        <TableCell>
-                          <div className="flex gap-2">
-                            <Button size="sm" variant="outline" className="h-8 px-3 bg-accent hover:bg-accent-hover">
-                              <Copy className="h-3 w-3 mr-1" />
-                              Use Template
-                            </Button>
-                          </div>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                  </TableBody>
-                </Table>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+            <div className="space-y-2">
+              <label className="text-sm font-medium text-foreground">Has been exported</label>
+              <Select value={filters.hasBeenExported} onValueChange={(value) => setFilters(prev => ({ ...prev, hasBeenExported: value }))}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="All" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All</SelectItem>
+                  <SelectItem value="yes">Yes</SelectItem>
+                  <SelectItem value="no">No</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
       </div>
     </AppLayout>
   );
