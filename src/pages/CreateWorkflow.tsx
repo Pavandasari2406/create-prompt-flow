@@ -81,309 +81,327 @@ export default function CreateWorkflow() {
 
   return (
     <AppLayout>
-      <div className="p-6 max-w-7xl mx-auto space-y-8">
-        {/* Header */}
-        <div className="flex items-center gap-4">
-          <Button 
-            variant="ghost" 
-            size="icon"
-            onClick={() => navigate("/workflows")}
-            className="h-10 w-10"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <h1 className="text-4xl font-bold text-foreground">Create New Workflow</h1>
-        </div>
+      <div className="min-h-screen bg-gradient-subtle">
+        <div className="max-w-6xl mx-auto p-6 space-y-8">
+          {/* Elegant Header */}
+          <div className="text-center space-y-4 py-8">
+            <Button 
+              variant="ghost" 
+              size="sm"
+              onClick={() => navigate("/workflows")}
+              className="absolute top-6 left-6 text-muted-foreground hover:text-foreground"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Back
+            </Button>
+            <div className="space-y-2">
+              <h1 className="text-5xl font-light text-foreground tracking-tight">
+                Create Workflow
+              </h1>
+              <p className="text-muted-foreground text-lg">
+                Design your perfect prompt generation workflow
+              </p>
+            </div>
+          </div>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          {/* Basic Information */}
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="space-y-3">
-                <Label htmlFor="name" className="text-base font-medium">Workflow Name</Label>
-                <Input
-                  id="name"
-                  value={formData.name}
-                  onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                  className="h-12 text-base"
-                />
+          <form onSubmit={handleSubmit} className="space-y-8">
+            {/* Essential Details - Clean Card */}
+            <div className="bg-background/80 backdrop-blur-sm rounded-2xl border shadow-lg p-8 space-y-8">
+              <h2 className="text-2xl font-medium text-foreground mb-6">Essential Details</h2>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div className="space-y-2">
+                  <Label className="text-base font-medium text-foreground">Workflow Name</Label>
+                  <Input
+                    value={formData.name}
+                    onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
+                    className="h-12 text-base border-border/50 focus:border-primary bg-background/50"
+                    placeholder="Enter a descriptive name..."
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label className="text-base font-medium text-foreground">Workflow Type</Label>
+                  <RadioGroup 
+                    value={formData.workflowType} 
+                    onValueChange={(value) => setFormData(prev => ({ ...prev, workflowType: value }))}
+                    className="flex gap-8 pt-2"
+                  >
+                    <div className="flex items-center space-x-3">
+                      <RadioGroupItem value="SFW" id="sfw" className="h-5 w-5" />
+                      <Label htmlFor="sfw" className="text-base font-medium cursor-pointer">Safe for Work</Label>
+                    </div>
+                    <div className="flex items-center space-x-3">
+                      <RadioGroupItem value="NSFW" id="nsfw" className="h-5 w-5" />
+                      <Label htmlFor="nsfw" className="text-base font-medium cursor-pointer">Not Safe for Work</Label>
+                    </div>
+                  </RadioGroup>
+                </div>
               </div>
 
-              <div className="space-y-3">
-                <Label htmlFor="description" className="text-base font-medium">Description</Label>
+              <div className="space-y-2">
+                <Label className="text-base font-medium text-foreground">Description</Label>
                 <Textarea
-                  id="description"
                   value={formData.description}
                   onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
-                  className="min-h-24 text-base resize-none"
+                  className="min-h-20 text-base border-border/50 focus:border-primary bg-background/50 resize-none"
+                  placeholder="Briefly describe what this workflow generates..."
                 />
               </div>
+            </div>
 
-              <div className="space-y-3">
-                <Label className="text-base font-medium">
-                  Workflow Type (Determines System Prompt & Default Config):
-                </Label>
-                <RadioGroup 
-                  value={formData.workflowType} 
-                  onValueChange={(value) => setFormData(prev => ({ ...prev, workflowType: value }))}
-                  className="flex gap-6"
-                >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="SFW" id="sfw" />
-                    <Label htmlFor="sfw" className="text-base font-medium">SFW</Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="NSFW" id="nsfw" />
-                    <Label htmlFor="nsfw" className="text-base font-medium">NSFW</Label>
-                  </div>
-                </RadioGroup>
-              </div>
+            {/* Core Prompt - Featured Card */}
+            <div className="bg-gradient-to-br from-primary/5 to-primary/10 rounded-2xl border border-primary/20 shadow-lg p-8 space-y-6">
+              <h2 className="text-2xl font-medium text-foreground">Core Workflow Prompt</h2>
+              <p className="text-muted-foreground">The main instructions that guide your AI model</p>
+              
+              <Textarea
+                value={formData.corePrompt}
+                onChange={(e) => setFormData(prev => ({ ...prev, corePrompt: e.target.value }))}
+                placeholder="Generate a general character prompt. The person should be out of shape, unattractive, and the photo should be grainy and low quality. Use prompting to make the photograph look realistic..."
+                className="min-h-32 text-base border-primary/30 focus:border-primary bg-background/70 resize-none"
+              />
 
-              <div className="space-y-3">
-                <Label htmlFor="corePrompt" className="text-base font-medium">
-                  Core Workflow Prompt (Context/Instructions for LLM)
-                </Label>
-                <Textarea
-                  id="corePrompt"
-                  value={formData.corePrompt}
-                  onChange={(e) => setFormData(prev => ({ ...prev, corePrompt: e.target.value }))}
-                  placeholder="Generate a general character prompt. The person should be out of shape, unattractive, and the photo should be grainy and low quality. Use prompting to make the photograph look realistic. Describe the person's expression as well as their body language. Be sure to include a description of the location and what the person is doing using keywords. Don't only rely on the keywords, but also use the prompts to make the photo look realistic."
-                  className="min-h-32 text-base resize-none"
-                />
-              </div>
-
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <Label htmlFor="minWords" className="text-base font-medium">Minimum Words</Label>
+              <div className="grid grid-cols-2 gap-6 pt-4">
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Minimum Words</Label>
                   <Input
-                    id="minWords"
                     type="number"
                     value={formData.minWords}
                     onChange={(e) => setFormData(prev => ({ ...prev, minWords: e.target.value }))}
-                    className="h-12 text-base"
+                    className="h-12 border-primary/30 focus:border-primary bg-background/70"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    If prompt is too short, forced positive terms will be added to reach this length.
-                  </p>
+                  <p className="text-xs text-muted-foreground">Forced terms added if too short</p>
                 </div>
-                <div className="space-y-3">
-                  <Label htmlFor="maxWords" className="text-base font-medium">Maximum Words</Label>
+                <div className="space-y-2">
+                  <Label className="text-base font-medium">Maximum Words</Label>
                   <Input
-                    id="maxWords"
                     type="number"
                     value={formData.maxWords}
                     onChange={(e) => setFormData(prev => ({ ...prev, maxWords: e.target.value }))}
-                    className="h-12 text-base"
+                    className="h-12 border-primary/30 focus:border-primary bg-background/70"
                   />
-                  <p className="text-sm text-muted-foreground">
-                    If prompt is too long, it will be truncated to this length.
-                  </p>
+                  <p className="text-xs text-muted-foreground">Truncated if too long</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Prompt Configuration */}
-          <Card>
-            <CardContent className="p-6 space-y-6">
-              <div className="grid grid-cols-2 gap-8">
+            {/* Prompt Configuration - Dual Panel */}
+            <div className="bg-background/80 backdrop-blur-sm rounded-2xl border shadow-lg p-8 space-y-8">
+              <h2 className="text-2xl font-medium text-foreground">Prompt Enhancement</h2>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {/* Positive Prompts */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">Positive Prompts</Label>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="useMyInputsPositive"
-                        checked={formData.useMyInputsPositive}
-                        onCheckedChange={(checked) => setFormData(prev => ({ ...prev, useMyInputsPositive: !!checked }))}
-                      />
-                      <Label htmlFor="useMyInputsPositive" className="text-sm">Use My Inputs</Label>
-                      <Badge variant="outline">3 prompts</Badge>
+                    <Label className="text-lg font-medium text-foreground">Positive Prompts</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="useMyInputsPositive"
+                          checked={formData.useMyInputsPositive}
+                          onCheckedChange={(checked) => setFormData(prev => ({ ...prev, useMyInputsPositive: !!checked }))}
+                        />
+                        <Label htmlFor="useMyInputsPositive" className="text-sm cursor-pointer">Use My Inputs</Label>
+                      </div>
+                      <Badge variant="secondary" className="bg-primary/10 text-primary">3 prompts</Badge>
                     </div>
                   </div>
                   <Textarea
                     value={formData.positivePrompts}
                     onChange={(e) => setFormData(prev => ({ ...prev, positivePrompts: e.target.value }))}
                     placeholder="attractive and unprofessional picture&#10;ugly person&#10;low quality photo&#10;bad lighting&#10;dim lighting&#10;dark"
-                    className="min-h-32 text-sm resize-none font-mono"
+                    className="min-h-32 text-sm font-mono bg-muted/30 border-border/50 focus:border-primary resize-none"
                   />
                 </div>
 
+                {/* Forced Positive Prompts */}
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">FORCED Positive Prompts (ALWAYS INCLUDED IN PROMPT)</Label>
-                    <div className="flex items-center space-x-2">
-                      <Checkbox 
-                        id="useMyInputsForced"
-                        checked={formData.useMyInputsForced}
-                        onCheckedChange={(checked) => setFormData(prev => ({ ...prev, useMyInputsForced: !!checked }))}
-                      />
-                      <Label htmlFor="useMyInputsForced" className="text-sm">Use My Inputs</Label>
+                    <Label className="text-lg font-medium text-foreground">Forced Prompts</Label>
+                    <div className="flex items-center gap-3">
+                      <div className="flex items-center space-x-2">
+                        <Checkbox 
+                          id="useMyInputsForced"
+                          checked={formData.useMyInputsForced}
+                          onCheckedChange={(checked) => setFormData(prev => ({ ...prev, useMyInputsForced: !!checked }))}
+                        />
+                        <Label htmlFor="useMyInputsForced" className="text-sm cursor-pointer">Use My Inputs</Label>
+                      </div>
+                      <Badge variant="destructive" className="bg-orange-100 text-orange-700 dark:bg-orange-900 dark:text-orange-300">Always Included</Badge>
                     </div>
                   </div>
                   <Textarea
                     value={formData.forcedPositivePrompts}
                     onChange={(e) => setFormData(prev => ({ ...prev, forcedPositivePrompts: e.target.value }))}
-                    className="min-h-32 text-sm resize-none font-mono"
+                    className="min-h-32 text-sm font-mono bg-muted/30 border-border/50 focus:border-primary resize-none"
                   />
+                  <p className="text-xs text-muted-foreground">These prompts are always included in every generation</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Selection Categories */}
-          <Card>
-            <CardContent className="p-6">
-              <div className="grid grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Selection Categories - Modern Grid */}
+            <div className="bg-background/80 backdrop-blur-sm rounded-2xl border shadow-lg p-8 space-y-8">
+              <h2 className="text-2xl font-medium text-foreground">Content Categories</h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
                 {/* Actions/Poses */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">Actions / Poses (SFW)</Label>
-                    <Badge variant="outline">{formData.selectedActions.length} pose(s)</Badge>
+                    <Label className="text-base font-medium">Actions & Poses</Label>
+                    <Badge variant="outline" className="text-xs">{formData.selectedActions.length}</Badge>
                   </div>
-                  <ScrollArea className="h-48 border rounded-md">
-                    <div className="p-3 space-y-2">
-                      {actionsOptions.map((action) => (
-                        <div 
-                          key={action}
-                          className={`p-2 text-sm rounded cursor-pointer transition-colors ${
-                            formData.selectedActions.includes(action)
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted'
-                          }`}
-                          onClick={() => toggleSelection(action, 'selectedActions')}
-                        >
-                          {action}
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
+                  <div className="bg-muted/20 rounded-lg border max-h-64 overflow-hidden">
+                    <ScrollArea className="h-64">
+                      <div className="p-3 space-y-1">
+                        {actionsOptions.map((action) => (
+                          <div 
+                            key={action}
+                            className={`p-3 text-sm rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                              formData.selectedActions.includes(action)
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'hover:bg-muted/50'
+                            }`}
+                            onClick={() => toggleSelection(action, 'selectedActions')}
+                          >
+                            {action}
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
                 </div>
 
                 {/* Expressions */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">Expressions (SFW)</Label>
-                    <Badge variant="outline">{formData.selectedExpressions.length} expression(s)</Badge>
+                    <Label className="text-base font-medium">Expressions</Label>
+                    <Badge variant="outline" className="text-xs">{formData.selectedExpressions.length}</Badge>
                   </div>
-                  <ScrollArea className="h-48 border rounded-md">
-                    <div className="p-3 space-y-2">
-                      {expressionsOptions.map((expression) => (
-                        <div 
-                          key={expression}
-                          className={`p-2 text-sm rounded cursor-pointer transition-colors ${
-                            formData.selectedExpressions.includes(expression)
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted'
-                          }`}
-                          onClick={() => toggleSelection(expression, 'selectedExpressions')}
-                        >
-                          {expression}
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
+                  <div className="bg-muted/20 rounded-lg border max-h-64 overflow-hidden">
+                    <ScrollArea className="h-64">
+                      <div className="p-3 space-y-1">
+                        {expressionsOptions.map((expression) => (
+                          <div 
+                            key={expression}
+                            className={`p-3 text-sm rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                              formData.selectedExpressions.includes(expression)
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'hover:bg-muted/50'
+                            }`}
+                            onClick={() => toggleSelection(expression, 'selectedExpressions')}
+                          >
+                            {expression}
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
                 </div>
 
                 {/* Locations */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
-                    <Label className="text-base font-medium">Locations (SFW)</Label>
-                    <Badge variant="outline">{formData.selectedLocations.length} location(s)</Badge>
+                    <Label className="text-base font-medium">Locations</Label>
+                    <Badge variant="outline" className="text-xs">{formData.selectedLocations.length}</Badge>
                   </div>
-                  <ScrollArea className="h-48 border rounded-md">
-                    <div className="p-3 space-y-2">
-                      {locationsOptions.map((location) => (
-                        <div 
-                          key={location}
-                          className={`p-2 text-sm rounded cursor-pointer transition-colors ${
-                            formData.selectedLocations.includes(location)
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted'
-                          }`}
-                          onClick={() => toggleSelection(location, 'selectedLocations')}
-                        >
-                          {location}
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
+                  <div className="bg-muted/20 rounded-lg border max-h-64 overflow-hidden">
+                    <ScrollArea className="h-64">
+                      <div className="p-3 space-y-1">
+                        {locationsOptions.map((location) => (
+                          <div 
+                            key={location}
+                            className={`p-3 text-sm rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                              formData.selectedLocations.includes(location)
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'hover:bg-muted/50'
+                            }`}
+                            onClick={() => toggleSelection(location, 'selectedLocations')}
+                          >
+                            {location}
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
                 </div>
 
                 {/* Clothing */}
-                <div className="space-y-3">
+                <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <Label className="text-base font-medium">Clothing</Label>
-                    <Badge variant="outline">{formData.selectedClothing.length} clothing item(s)</Badge>
+                    <Badge variant="outline" className="text-xs">{formData.selectedClothing.length}</Badge>
                   </div>
-                  <ScrollArea className="h-48 border rounded-md">
-                    <div className="p-3 space-y-2">
-                      {clothingOptions.map((clothing) => (
-                        <div 
-                          key={clothing}
-                          className={`p-2 text-sm rounded cursor-pointer transition-colors ${
-                            formData.selectedClothing.includes(clothing)
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted'
-                          }`}
-                          onClick={() => toggleSelection(clothing, 'selectedClothing')}
-                        >
-                          {clothing}
-                        </div>
-                      ))}
-                    </div>
-                  </ScrollArea>
+                  <div className="bg-muted/20 rounded-lg border max-h-64 overflow-hidden">
+                    <ScrollArea className="h-64">
+                      <div className="p-3 space-y-1">
+                        {clothingOptions.map((clothing) => (
+                          <div 
+                            key={clothing}
+                            className={`p-3 text-sm rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.02] ${
+                              formData.selectedClothing.includes(clothing)
+                                ? 'bg-primary text-primary-foreground shadow-sm'
+                                : 'hover:bg-muted/50'
+                            }`}
+                            onClick={() => toggleSelection(clothing, 'selectedClothing')}
+                          >
+                            {clothing}
+                          </div>
+                        ))}
+                      </div>
+                    </ScrollArea>
+                  </div>
                 </div>
               </div>
 
-              {/* Lighting Section */}
-              <div className="mt-8 space-y-3">
+              {/* Lighting - Full Width */}
+              <div className="space-y-4 pt-6 border-t border-border/50">
                 <div className="flex items-center justify-between">
-                  <Label className="text-base font-medium">Lighting (SFW)</Label>
-                  <Badge variant="outline">{formData.selectedLighting.length} lighting option(s)</Badge>
+                  <Label className="text-base font-medium">Lighting Options</Label>
+                  <Badge variant="outline" className="text-xs">{formData.selectedLighting.length} selected</Badge>
                 </div>
-                <ScrollArea className="h-32 border rounded-md">
-                  <div className="p-3">
-                    <div className="grid grid-cols-3 gap-2">
-                      {lightingOptions.map((lighting) => (
-                        <div 
-                          key={lighting}
-                          className={`p-2 text-sm rounded cursor-pointer transition-colors ${
-                            formData.selectedLighting.includes(lighting)
-                              ? 'bg-primary text-primary-foreground'
-                              : 'hover:bg-muted'
-                          }`}
-                          onClick={() => toggleSelection(lighting, 'selectedLighting')}
-                        >
-                          {lighting}
-                        </div>
-                      ))}
-                    </div>
+                <div className="bg-muted/20 rounded-lg border p-4">
+                  <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-2">
+                    {lightingOptions.map((lighting) => (
+                      <div 
+                        key={lighting}
+                        className={`p-3 text-sm rounded-lg cursor-pointer transition-all duration-200 hover:scale-[1.02] text-center ${
+                          formData.selectedLighting.includes(lighting)
+                            ? 'bg-primary text-primary-foreground shadow-sm'
+                            : 'hover:bg-muted/50'
+                        }`}
+                        onClick={() => toggleSelection(lighting, 'selectedLighting')}
+                      >
+                        {lighting}
+                      </div>
+                    ))}
                   </div>
-                </ScrollArea>
+                </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Actions */}
-          <div className="flex gap-4">
-            <Button 
-              type="submit"
-              size="lg"
-              className="bg-green-600 hover:bg-green-700 text-white px-8"
-            >
-              Create Workflow
-            </Button>
-            <Button 
-              type="button" 
-              variant="outline"
-              size="lg"
-              onClick={() => navigate("/workflows")}
-              className="px-8"
-            >
-              Cancel
-            </Button>
-          </div>
-        </form>
+            {/* Action Buttons - Centered */}
+            <div className="flex justify-center gap-6 pt-8 pb-16">
+              <Button 
+                type="submit"
+                size="lg"
+                className="bg-green-600 hover:bg-green-700 text-white px-12 py-4 text-lg font-medium rounded-xl shadow-lg hover:shadow-xl transition-all duration-200"
+              >
+                Create Workflow
+              </Button>
+              <Button 
+                type="button" 
+                variant="outline"
+                size="lg"
+                onClick={() => navigate("/workflows")}
+                className="px-12 py-4 text-lg font-medium rounded-xl border-2 hover:bg-muted/50 transition-all duration-200"
+              >
+                Cancel
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </AppLayout>
   );
